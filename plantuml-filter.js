@@ -12,14 +12,17 @@ function filterPlantuml(type, value, format, meta) {
     }
 
     var cls = value[0][1];
-    if (0 > cls.indexOf('plantuml')) {
+    // compatible with gitbook-plugin-uml, TODO: support multiple code block
+    if (0 > cls.indexOf('puml')) {
         return null;
     }
 
     var umlText = value[1];
 
-    var plantumlPath = path.join(__dirname, "plantuml.8036.jar");
-    var res = execSync(util.format("java -splash:no -jar \"%s\" -charset UTF-8 -pipe", plantumlPath), { input: umlText });
+    // var plantumlPath = path.join(__dirname, "plantuml.8036.jar");
+    // var res = execSync(util.format("java -splash:no -jar \"%s\" -charset UTF-8 -pipe", plantumlPath), { input: umlText });
+    // prefer system's plantuml, TODO: use local as a backup
+    var res = execSync(util.format("plantuml -charset UTF-8 -pipe"), { input: umlText });
     var tempDirName = ".temp";
     if (!fs.existsSync(tempDirName)) {
         fs.mkdirSync(tempDirName);
@@ -49,13 +52,13 @@ function filterPlantuml(type, value, format, meta) {
 // var data = require("./1.json");
 // var res = pandoc.filter(data, filterPlantuml, "");
 // var strRes = JSON.stringify(res);
-// 
+//
 // fs.writeFile("2.json", strRes, function (err) {
 //     if (err) {
 //         return console.log(err);
 //     }
-// 
+//
 //     console.log("The file was saved!");
-// }); 
+// });
 
 pandoc.toJSONFilter(filterPlantuml);
